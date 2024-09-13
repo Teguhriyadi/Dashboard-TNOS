@@ -113,6 +113,7 @@ export const Routes = {
   PwaB2bIncome: { path: "/pwa-b2b/income" },
   PwaB2bSecurityProvider: { path: "/pwa-b2b/security-provider" },
   PwaB2bSecurityProviderLayanan: { path: "/pwa-b2b/security-provider/:id/layanan" },
+  PwaB2bUnit: { path: "/pwa-b2b/unit" },
   PwaB2bRefund: { path: "/pwa-b2b/refund" },
   PwaB2bPartnerPayments: { path: "/pwa-b2b/partner-payments" },
   PwaB2bVoucher: { path: "/pwa-b2b/voucher" },

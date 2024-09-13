@@ -82,6 +82,7 @@ import PwaB2bPaymentVoucherDetail from "./pwaB2b/PaymentVoucherDetail";
 import PwaB2bOrderPesan from "./pwaB2b/OrderPesan.js";
 import PwaB2bSecurityProvider from "./pwaB2b/SecurityProvider.js";
 import PwaB2bSecurityProviderLayanan from "./pwaB2b/LayananSecurityProvider.js";
+import PwaB2bUnit from "./pwaB2b/Unit.js"
 import PwaB2bSection from "./pwaB2b/Section.js";
 import PwaB2bProduct from "./pwaB2b/Product.js";
 import PwaB2bProductSubSection from "./pwaB2b/ProductSubSection.js";
@@ -471,6 +472,11 @@ export default () => {
       id: 24,
       component: PwaB2bSecurityProvider,
       path: Routes.PwaB2bSecurityProvider.path,
+    },
+    {
+      id: 24,
+      component: PwaB2bUnit,
+      path: Routes.PwaB2bUnit.path
     },
     {
       id: 24,

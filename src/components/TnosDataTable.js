@@ -11,7 +11,7 @@ import ReadableDateTime from "./ReadableDateTime";
 export const TnosDataTable = (props) => {
 
     const location = useLocation()
-    const isSecurityProviderRoute = location.pathname === "/pwa-b2b/security-provider" || location.pathname.startsWith("/pwa-b2b/security-provider/") || location.pathname.startsWith("/pwa-b2b/layanan/") || location.pathname.startsWith("/pwa-b2b/section") || location.pathname.endsWith("/others");
+    const isSecurityProviderRoute = location.pathname === "/pwa-b2b/security-provider" || location.pathname.startsWith("/pwa-b2b/security-provider/") || location.pathname.startsWith("/pwa-b2b/layanan/") || location.pathname.startsWith("/pwa-b2b/section") || location.pathname.endsWith("/others") || location.pathname.includes("/unit");
     const isTAB = location.pathname === "/tab/kategori-usaha" || location.pathname === "/tab/banner";
 
     const [showModal, setShowModal] = useState(false);

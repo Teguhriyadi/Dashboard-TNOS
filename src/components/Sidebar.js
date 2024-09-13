@@ -234,6 +234,11 @@ export default (props = {}) => {
           title: "Security Provider",
           link: Routes.PwaB2bSecurityProvider.path
         },
+        {
+          id: 62,
+          title: "Unit",
+          link: Routes.PwaB2bUnit.path
+        }
         // {
         //   id: 60,
         //   title: "Refund",

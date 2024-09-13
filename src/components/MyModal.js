@@ -359,6 +359,8 @@ const MyModal = ({ show, handleClose, id, isEditing, isTable }) => {
                     }
                 } else if (location.pathname === "/pwa-b2b/security-provider") {
                     apiUrl = apiUrl
+                } else if (location.pathname.includes("/pwa-b2b/unit")) {
+                    apiUrl = `${process.env.REACT_APP_API_PWA_TNOS_DSBRD_URL}/pwa-revamp/unit`
                 } else {
                     const id = location.pathname.split("/")[3];
                     apiUrl = `${process.env.REACT_APP_API_PWA_TNOS_DSBRD_URL}/pwa-revamp/section`;
@@ -449,6 +451,8 @@ const MyModal = ({ show, handleClose, id, isEditing, isTable }) => {
                         response = await axios.get(`${process.env.REACT_APP_API_PWA_TNOS_DSBRD_URL}/pwa-revamp/product/${id}/show`)
                     } else if (isTable === "subsection") {
                         response = await axios.get(`${process.env.REACT_APP_API_PWA_TNOS_DSBRD_URL}/pwa-revamp/subsection/${id}/show`)
+                    } else if (isTable === "unit") {
+                        response = await axios.get(`${process.env.REACT_APP_API_PWA_TNOS_DSBRD_URL}/pwa-revamp/unit/${id}/show`)
                     }
 
                     if (response) {
@@ -936,6 +940,25 @@ const MyModal = ({ show, handleClose, id, isEditing, isTable }) => {
                             <></>
                         )}
                     </Form>
+                ) : (location.pathname.includes("/pwa-b2b/unit")) ? (
+                    <>
+                        <Form onSubmit={handleSubmit} method="POST">
+                        <div className="mb-3">
+                            <label htmlFor="satuan" className="form-label">
+                                Satuan
+                            </label>
+                            <input
+                                type="text"
+                                className="form-control"
+                                id="satuan"
+                                name="satuan"
+                                placeholder="Masukkan Satuan"
+                                value={formData.satuan || ""}
+                                onChange={handleChange}
+                            />
+                        </div>
+                    </Form>
+                    </>
                 ) : (
                     <Form onSubmit={handleSubmit} method="POST">
                         <div className="mb-3">
