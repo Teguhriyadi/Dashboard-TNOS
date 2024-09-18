@@ -88,6 +88,7 @@ import PwaB2bProduct from "./pwaB2b/Product.js";
 import PwaB2bProductSubSection from "./pwaB2b/ProductSubSection.js";
 import PwaB2bSubSection from "./pwaB2b/SubSection.js";
 import PwaB2bOthers from "./pwaB2b/Others.js";
+import PWaB2bOthersComponents from "./pwaB2b/OthersComponent.js"
 
 import ConsultationChatIndex from "./consultationChat/Index";
 import ConsultationChatList from "./consultationChat/List";
@@ -507,6 +508,11 @@ export default () => {
       id: 24,
       component: PwaB2bOthers,
       path: Routes.PwaB2bLainnyaOthers.path
+    },
+    {
+      id: 24,
+      component: PWaB2bOthersComponents,
+      path: Routes.PwaB2bComponentOthers.path
     },
     {
       id: 24,

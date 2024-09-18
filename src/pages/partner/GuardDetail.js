@@ -10,6 +10,8 @@ import {
   Button,
   Modal,
   Badge,
+  Alert,
+  InputGroup,
 } from "@themesberg/react-bootstrap";
 import { useParams } from "react-router-dom";
 import Preloader from "../../components/Preloader";
@@ -19,7 +21,14 @@ export default () => {
   const { id } = useParams();
 
   const [getGuardFrontData, setGuardFrontData] = useState();
+  const [getInnerAlert, setInnerAlert] = useState();
+  const [showAlert, setShowAlert] = useState(false);
   const [getGuardData, setGuardData] = useState();
+  const [image, setImage] = useState(null);
+  const [preview, setPreview] = useState(null);
+  const [getDocFile, setDocFile] = useState(null);
+  const [showBtn, setShowBtn] = useState(false);
+  const [getModalType, setModalType] = useState("document");
   const [getDocumentModalTitle, setDocumentModalTitle] = useState("");
   const [showDefault, setShowDefault] = useState(false);
   const [getGenderArr] = useState([
@@ -114,6 +123,118 @@ export default () => {
     { key: "asal_korps_polri_3", value: "3", defaultValue: "Polisi Pantai" },
     { key: "asal_korps_polri_4", value: "4", defaultValue: "Polwan" },
   ]);
+
+  const getPhotoMitra = (code, photo) => {
+    let arrphoto1 = [];
+    let arrphoto2 = [];
+    let arrphoto3 = "";
+    if (photo) {
+      arrphoto1 = photo.split("-");
+      arrphoto2 = arrphoto1[1].split("_");
+      arrphoto3 = arrphoto2[1].split(".");
+    }
+
+    let avatar = "";
+    if (arrphoto3) {
+      avatar =
+        "https://01-tnos-storage.s3.ap-southeast-1.amazonaws.com/IMG/" +
+        arrphoto2[0] +
+        "/" +
+        code +
+        "/" +
+        arrphoto1[0] +
+        "/" +
+        arrphoto3[0] +
+        "/" +
+        photo;
+    }
+
+    return avatar;
+  };
+
+  const getDoc = (datax, label) => {
+    let resdata = JSON.parse(datax);
+    let photo = '';
+    if (label === 'KTP') {
+      let photoa = resdata[0].fileKtp.split('-');
+      let photob = photoa[1].split('_');
+      let id = photoa[0];
+      let type = photob[0];
+      let uida = photob[1].split('.');
+      let uid = uida[0];
+      photo = 'IMG/IDC/' + getGuardFrontData?.code + '/' + id + '/' + uid + '/' + resdata[0].fileKtp;
+    } else if (label === 'Foto') {
+      let photoa = resdata[0].filePhoto.split('-');
+      let photob = photoa[1].split('_');
+      let id = photoa[0];
+      let type = photob[0];
+      let uida = photob[1].split('.');
+      let uid = uida[0];
+      photo = 'IMG/AVA/' + getGuardFrontData?.code + '/' + id + '/' + uid + '/' + resdata[0].filePhoto;
+    } else if (label === 'Lain-Lain') {
+      let photoa = resdata[0].fileAnother.split('-');
+      let photob = photoa[1].split('_');
+      let id = photoa[0];
+      let type = photob[0];
+      let uida = photob[1].split('.');
+      let uid = uida[0];
+      photo = 'IMG/SID/' + getGuardFrontData?.code + '/' + id + '/' + uid + '/' + resdata[0].fileAnother;
+    }
+    let fileattach = 'https://01-tnos-storage.s3.ap-southeast-1.amazonaws.com/' + photo;
+    setDocFile(fileattach)
+    // console.log("------------------------------")
+    // console.log(label);
+    // console.log(photo);
+    // console.log("------------------------------")
+  };
+
+  const handleChange = (event) => {
+    if (event.target.files.length > 0) {
+      setImage(event.target.files[0]);
+      setPreview(URL.createObjectURL(event.target.files[0]));
+      setShowBtn(true);
+    }
+  };
+
+  const handleUpload = (partner_code) => {
+    // Code to send image to server and save in folder here
+    const formData = new FormData();
+    const fileName = "guard-" + partner_code + ".jpg";
+    const renamedImage = new File([image], fileName, { type: image.type });
+    formData.append("mitracode", partner_code);
+    formData.append("photo_file", renamedImage);
+
+    fetch(`${process.env.REACT_APP_MITRA_TNOS_API_URL}/update-photo-mitra`, {
+      method: "POST",
+      body: formData,
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        if (JSON.parse(data).statusCode === "200") {
+          setInnerAlert({
+            color: "success",
+            message: "Foto berhasil diubah",
+          });
+          setShowAlert(true);
+          setTimeout(() => {
+            setShowAlert(false);
+            window.location.reload();
+          }, 3000);
+        }
+      })
+      .catch((error) => {
+        setInnerAlert({
+          color: "danger",
+          message: "Something went wrong, please check your connection",
+        });
+        setShowAlert(true);
+        setTimeout(() => {
+          setShowAlert(false);
+        }, 3000);
+        console.error(error);
+      });
+  };
+
   const [getBrevetQualificationPolri] = useState([
     {
       key: "kualifikasi_bravet_polri_1",
@@ -588,6 +709,11 @@ export default () => {
       });
   }, [id]);
 
+  console.log("Detail");
+
+  console.log(getGuardData);
+
+
   const handleClose = () => setShowDefault(false);
 
   const changeStatusPartner = (e) => {
@@ -656,16 +782,16 @@ export default () => {
                           {getGuardFrontData?.mmit_date_insert === null
                             ? "-"
                             : ReadableDateTime(
-                                getGuardFrontData?.mmit_date_insert
-                              ).split(" ")[0]}
+                              getGuardFrontData?.mmit_date_insert
+                            ).split(" ")[0]}
                         </li>
                         <li>
                           <b>Jam Mendaftar : </b>
                           {getGuardFrontData?.mmit_date_insert === null
                             ? "-"
                             : ReadableDateTime(
-                                getGuardFrontData?.mmit_date_insert
-                              ).split(" ")[1]}
+                              getGuardFrontData?.mmit_date_insert
+                            ).split(" ")[1]}
                         </li>
                         <li>
                           <b>Klasifikasi : </b>
@@ -694,47 +820,47 @@ export default () => {
                               getGuardFrontData?.mmit_status === 0
                                 ? "cyan"
                                 : getGuardFrontData?.mmit_status === 1
-                                ? "soft-green"
-                                : getGuardFrontData?.mmit_status === 2
-                                ? "warning"
-                                : getGuardFrontData?.mmit_status === 3
-                                ? "secondary"
-                                : getGuardFrontData?.mmit_status === 4
-                                ? "primary"
-                                : getGuardFrontData?.mmit_status === 5
-                                ? "gray"
-                                : getGuardFrontData?.mmit_status === 6
-                                ? "blue"
-                                : getGuardFrontData?.mmit_status === 7
-                                ? "pink"
-                                : getGuardFrontData?.mmit_status === 9
-                                ? "success"
-                                : getGuardFrontData?.mmit_status === 10
-                                ? "gray"
-                                : ""
+                                  ? "soft-green"
+                                  : getGuardFrontData?.mmit_status === 2
+                                    ? "warning"
+                                    : getGuardFrontData?.mmit_status === 3
+                                      ? "secondary"
+                                      : getGuardFrontData?.mmit_status === 4
+                                        ? "primary"
+                                        : getGuardFrontData?.mmit_status === 5
+                                          ? "gray"
+                                          : getGuardFrontData?.mmit_status === 6
+                                            ? "blue"
+                                            : getGuardFrontData?.mmit_status === 7
+                                              ? "pink"
+                                              : getGuardFrontData?.mmit_status === 9
+                                                ? "success"
+                                                : getGuardFrontData?.mmit_status === 10
+                                                  ? "gray"
+                                                  : ""
                             }
                           >
                             {getGuardFrontData?.mmit_status === 0
                               ? "Menunggu Verifikasi"
                               : getGuardFrontData?.mmit_status === 1
-                              ? "Lolos Verifikasi Dokumen"
-                              : getGuardFrontData?.mmit_status === 2
-                              ? "Tidak Lolos Verifikasi Dokumen"
-                              : getGuardFrontData?.mmit_status === 3
-                              ? "Atur Jadwal Verifikasi Aktual"
-                              : getGuardFrontData?.mmit_status === 4
-                              ? "Menunggu Verifikasi Aktual"
-                              : getGuardFrontData?.mmit_status === 5
-                              ? "Jadwal Pembekalan"
-                              : getGuardFrontData?.mmit_status === 6
-                              ? "Tidak Lolos Verifikasi Aktual"
-                              : getGuardFrontData?.mmit_status === 7
-                              ? "Pembekalan"
-                              : getGuardFrontData?.mmit_status === 9
-                              ? "Online"
-                              : getGuardFrontData?.mmit_status === 10
-                              ? "Offline"
-                              : ""}
+                                ? "Lolos Verifikasi Dokumen"
+                                : getGuardFrontData?.mmit_status === 2
+                                  ? "Tidak Lolos Verifikasi Dokumen"
+                                  : getGuardFrontData?.mmit_status === 3
+                                    ? "Atur Jadwal Verifikasi Aktual"
+                                    : getGuardFrontData?.mmit_status === 4
+                                      ? "Menunggu Verifikasi Aktual"
+                                      : getGuardFrontData?.mmit_status === 5
+                                        ? "Jadwal Pembekalan"
+                                        : getGuardFrontData?.mmit_status === 6
+                                          ? "Tidak Lolos Verifikasi Aktual"
+                                          : getGuardFrontData?.mmit_status === 7
+                                            ? "Pembekalan"
+                                            : getGuardFrontData?.mmit_status === 9
+                                              ? "Online"
+                                              : getGuardFrontData?.mmit_status === 10
+                                                ? "Offline"
+                                                : ""}
                           </Badge>
                         </li>
                       </ul>
@@ -866,10 +992,10 @@ export default () => {
                           {getGuardData?.data.gender === null
                             ? "-"
                             : getGenderArr?.map(
-                                (item) =>
-                                  getGuardData?.data.gender === item.value &&
-                                  item.defaultValue
-                              )}
+                              (item) =>
+                                getGuardData?.data.gender === item.value &&
+                                item.defaultValue
+                            )}
                         </li>
                         <li>
                           <b>Golongan Darah : </b>
@@ -882,10 +1008,10 @@ export default () => {
                           {getGuardData?.data.status_kawin === null
                             ? "-"
                             : getMarriageStatusArr?.map(
-                                (item) =>
-                                  getGuardData?.data.status_kawin ===
-                                    item.value && item.defaultValue
-                              )}
+                              (item) =>
+                                getGuardData?.data.status_kawin ===
+                                item.value && item.defaultValue
+                            )}
                         </li>
                         <li>
                           <b>Pendidikan Terakhir : </b>
@@ -898,10 +1024,10 @@ export default () => {
                           {getGuardData?.data.tipesim === null
                             ? "-"
                             : getSimCategoryArr?.map(
-                                (item) =>
-                                  getGuardData?.data.tipesim === item.value &&
-                                  item.defaultValue
-                              )}
+                              (item) =>
+                                getGuardData?.data.tipesim === item.value &&
+                                item.defaultValue
+                            )}
                         </li>
                         <li>
                           <b>Jenis SIM : </b>
@@ -925,10 +1051,10 @@ export default () => {
                           {getGuardData?.data.current_job === null
                             ? "-"
                             : getCurrentJob?.map(
-                                (item) =>
-                                  getGuardData?.data.current_job ===
-                                    item.value && item.defaultValue
-                              )}
+                              (item) =>
+                                getGuardData?.data.current_job ===
+                                item.value && item.defaultValue
+                            )}
                         </li>
 
                         {getGuardData?.data.current_job === "1" ? (
@@ -938,32 +1064,32 @@ export default () => {
                               {getGuardData?.data.pangkat_terakhir === null
                                 ? "-"
                                 : getLastRank?.map(
-                                    (item) =>
-                                      getGuardData?.data.pangkat_terakhir ===
-                                        item.value && item.defaultValue
-                                  )}
+                                  (item) =>
+                                    getGuardData?.data.pangkat_terakhir ===
+                                    item.value && item.defaultValue
+                                )}
                             </li>
                             <li>
                               <b>Asal Korps : </b>
                               {getGuardData?.data.asal_korps === null
                                 ? "-"
                                 : getCorpsOrigin?.map(
-                                    (item) =>
-                                      getGuardData?.data.asal_korps ===
-                                        item.value && item.defaultValue
-                                  )}
+                                  (item) =>
+                                    getGuardData?.data.asal_korps ===
+                                    item.value && item.defaultValue
+                                )}
                             </li>
                             <li>
                               <b>Kualifikasi / Brevet : </b>
                               {getGuardData?.data.kualifikasi_bravet === null
                                 ? "-"
                                 : getBrevetQualification?.map((item) =>
-                                    getGuardData?.data.kualifikasi_bravet.map(
-                                      (subItem) =>
-                                        subItem === item.value &&
-                                        "[" + item.defaultValue + "] "
-                                    )
-                                  )}
+                                  getGuardData?.data.kualifikasi_bravet.map(
+                                    (subItem) =>
+                                      subItem === item.value &&
+                                      "[" + item.defaultValue + "] "
+                                  )
+                                )}
                             </li>
                           </>
                         ) : getGuardData?.data.current_job === "2" ? (
@@ -973,32 +1099,32 @@ export default () => {
                               {getGuardData?.data.pangkat_terakhir === null
                                 ? "-"
                                 : getLastRankPolri?.map(
-                                    (item) =>
-                                      getGuardData?.data.pangkat_terakhir ===
-                                        item.value && item.defaultValue
-                                  )}
+                                  (item) =>
+                                    getGuardData?.data.pangkat_terakhir ===
+                                    item.value && item.defaultValue
+                                )}
                             </li>
                             <li>
                               <b>Asal Korps : </b>
                               {getGuardData?.data.asal_korps === null
                                 ? "-"
                                 : getCorpsOriginPolri?.map(
-                                    (item) =>
-                                      getGuardData?.data.asal_korps ===
-                                        item.value && item.defaultValue
-                                  )}
+                                  (item) =>
+                                    getGuardData?.data.asal_korps ===
+                                    item.value && item.defaultValue
+                                )}
                             </li>
                             <li>
                               <b>Kualifikasi / Brevet : </b>
                               {getGuardData?.data.kualifikasi_bravet === null
                                 ? "-"
                                 : getBrevetQualificationPolri?.map((item) =>
-                                    getGuardData?.data.kualifikasi_bravet.map(
-                                      (subItem) =>
-                                        subItem === item.value &&
-                                        "[" + item.defaultValue + "] "
-                                    )
-                                  )}
+                                  getGuardData?.data.kualifikasi_bravet.map(
+                                    (subItem) =>
+                                      subItem === item.value &&
+                                      "[" + item.defaultValue + "] "
+                                  )
+                                )}
                             </li>
                           </>
                         ) : getGuardData?.data.current_job === "3" ? (
@@ -1008,30 +1134,30 @@ export default () => {
                               {getGuardData?.data.pendidikan_satpam === null
                                 ? "-"
                                 : getSecurityEducationArr?.map(
-                                    (item) =>
-                                      getGuardData?.data.pendidikan_satpam ===
-                                        item.value && item.defaultValue
-                                  )}
+                                  (item) =>
+                                    getGuardData?.data.pendidikan_satpam ===
+                                    item.value && item.defaultValue
+                                )}
                             </li>
                             <li>
                               <b>Bela Diri : </b>
                               {getGuardData?.data.bela_diri === null
                                 ? "-"
                                 : getSelfDefense?.map(
-                                    (item) =>
-                                      getGuardData?.data.bela_diri ===
-                                        item.value && item.defaultValue
-                                  )}
+                                  (item) =>
+                                    getGuardData?.data.bela_diri ===
+                                    item.value && item.defaultValue
+                                )}
                             </li>
                             <li>
                               <b>Tingkatan / Level : </b>
                               {getGuardData?.data.tingkatan_level === null
                                 ? "-"
                                 : getMartialArtsLevel?.map(
-                                    (item) =>
-                                      getGuardData?.data.tingkatan_level ===
-                                        item.value && item.defaultValue
-                                  )}
+                                  (item) =>
+                                    getGuardData?.data.tingkatan_level ===
+                                    item.value && item.defaultValue
+                                )}
                             </li>
                           </>
                         ) : (
@@ -1074,10 +1200,10 @@ export default () => {
                           {getGuardData?.data.bank === null
                             ? "-"
                             : getBankProvider?.map(
-                                (item) =>
-                                  getGuardData?.data.bank === item.value &&
-                                  item.defaultValue
-                              )}
+                              (item) =>
+                                getGuardData?.data.bank === item.value &&
+                                item.defaultValue
+                            )}
                         </li>
                         {[
                           ["Cabang", "cabang"],
@@ -1126,13 +1252,19 @@ export default () => {
                             <span
                               style={{ cursor: "pointer" }}
                               onClick={() => {
-                                setDocumentModalTitle(label);
+                                setDocumentModalTitle(
+                                  `Dokumen (${label})`
+                                );
                                 setShowDefault(true);
+                                setModalType("document");
+                                getDoc(getGuardFrontData?.mmid_data, label)
                               }}
                             >
                               <u value={key}>
                                 Lihat &nbsp;
-                                <FontAwesomeIcon icon={faExternalLinkAlt} />
+                                <FontAwesomeIcon
+                                  icon={faExternalLinkAlt}
+                                />
                               </u>
                             </span>
                           </li>
@@ -1155,7 +1287,76 @@ export default () => {
                           />
                         </Modal.Header>
                         <Modal.Body>
-                          <p>{getGuardData?.data}</p>
+                          {getModalType === "updateImage" ? (
+                            <>
+                              {showAlert && (
+                                <Alert
+                                  variant={getInnerAlert.color}
+                                  onClose={() =>
+                                    setShowAlert(false)
+                                  }
+                                  dismissible
+                                >
+                                  {/* <Alert.Heading>
+                                              Oh snap! You got an error!
+                                            </Alert.Heading> */}
+                                  {/* <p> */}
+                                  {getInnerAlert.message}
+                                  {/* </p> */}
+                                </Alert>
+                              )}
+                              {preview ? (
+                                  <img src={preview} alt="Preview" />
+                              ) : (
+                                  <img
+                                    src={getPhotoMitra(
+                                      getGuardFrontData?.code,
+                                      getGuardFrontData?.mmid_picture
+                                    )}
+                                    alt="Current"
+                                  />
+                              )}
+                              <InputGroup className="mt-2">
+                                <Form.Control
+                                  type="file"
+                                  onChange={handleChange}
+                                />
+                                {showBtn && (
+                                  <InputGroup.Text
+                                    className="bg-dark text-white"
+                                    style={{ cursor: "pointer" }}
+                                    onClick={() =>
+                                      handleUpload(
+                                        getGuardFrontData?.code
+                                      )
+                                    }
+                                  >
+                                    Upload
+                                  </InputGroup.Text>
+                                )}
+                              </InputGroup>
+                              {/* <input
+                                            type="file"
+                                            onChange={handleChange}
+                                            className="mt-2"
+                                          /> */}
+                              {/* {showBtn && (
+                                            <Button
+                                              onClick={() =>
+                                                handleUpload(
+                                                  getGuardFrontData?.code
+                                                )
+                                              }
+                                              size="sm"
+                                              className="float-end mt-2"
+                                            >
+                                              Upload
+                                            </Button>
+                                          )} */}
+                            </>
+                          ) : (
+                              <img src={getDocFile} alt="" />
+                          )}
                         </Modal.Body>
                       </Modal>
                     </Form.Group>

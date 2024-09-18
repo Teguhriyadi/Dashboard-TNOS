@@ -38,6 +38,8 @@ const MyModal = ({ show, handleClose, id, isEditing, isTable }) => {
         },
     ]);
 
+    const [getSatuanUnit, setSatuanUnit] = useState([])
+
     const handleChangeReference = (e) => {
 
         const { name, value } = e.target
@@ -361,6 +363,8 @@ const MyModal = ({ show, handleClose, id, isEditing, isTable }) => {
                     apiUrl = apiUrl
                 } else if (location.pathname.includes("/pwa-b2b/unit")) {
                     apiUrl = `${process.env.REACT_APP_API_PWA_TNOS_DSBRD_URL}/pwa-revamp/unit`
+                } else if (location.pathname.includes("/pwa-b2b/component-others")) {
+                    apiUrl = `${process.env.REACT_APP_API_PWA_TNOS_DSBRD_URL}/pwa-revamp/komponen-lainnya`
                 } else {
                     const id = location.pathname.split("/")[3];
                     apiUrl = `${process.env.REACT_APP_API_PWA_TNOS_DSBRD_URL}/pwa-revamp/section`;
@@ -430,8 +434,22 @@ const MyModal = ({ show, handleClose, id, isEditing, isTable }) => {
             }
         };
 
+        const fetchDataUnit = async () => {
+            try {
+                let response = await axios.get(`${process.env.REACT_APP_API_PWA_TNOS_DSBRD_URL}/pwa-revamp/unit`)
+
+                console.log("Data");
+                console.log(response.data.data.unit);
+                
+                setSatuanUnit(response.data.data.unit)
+            } catch (error) {
+                console.log(error);   
+            }
+        }
+
         if (location.pathname.includes("lainnya")) {
             fetchDataColumn();
+            fetchDataUnit()
         }
 
     }, [location.pathname]);
@@ -452,7 +470,7 @@ const MyModal = ({ show, handleClose, id, isEditing, isTable }) => {
                     } else if (isTable === "subsection") {
                         response = await axios.get(`${process.env.REACT_APP_API_PWA_TNOS_DSBRD_URL}/pwa-revamp/subsection/${id}/show`)
                     } else if (isTable === "unit") {
-                        response = await axios.get(`${process.env.REACT_APP_API_PWA_TNOS_DSBRD_URL}/pwa-revamp/unit/${id}/show`)
+                        response = await axios.get(`${process.env.REACT_APP_API_PWA_TNOS_DSBRD_URL}/pwa-revamp/unit2/${id}/show`)
                     }
 
                     if (response) {
@@ -511,10 +529,30 @@ const MyModal = ({ show, handleClose, id, isEditing, isTable }) => {
                         {location.pathname.endsWith("product-sub-section") ? (
                             <>
                                 <Form onSubmit={handleSubmit} method="POST">
-                                    <div className="mb-3">
-                                        <label htmlFor="column" className="form-label"> Kolom </label>
-                                        <input type="text" className="form-control" id="column" name="column" placeholder="Masukkan Nama Kolom" value={formData.column || ""} onChange={handleChange} />
-                                    </div>
+                                    <Row>
+                                        <Col md={6}>
+                                            <div className="mb-3">
+                                                <label htmlFor="column" className="form-label"> Kolom </label>
+                                                <input type="text" className="form-control" id="column" name="column" placeholder="Masukkan Nama Kolom" value={formData.column || ""} onChange={handleChange} />
+                                            </div>
+                                        </Col>
+                                        <Col md={6}>
+                                            <div className="mb-3">
+                                                <label htmlFor="satuan" className="form-label"> Satuan </label>
+                                                <Form.Select
+                                                    name="satuan"
+                                                    value={selectedSetting}
+                                                    onChange={(e) => setSelectedSetting(parseInt(e.target.value))}
+                                                >
+                                                    {getSatuanUnit?.map((item) => (
+                                                        <option key={item.key} value={item.id}>
+                                                            {item.satuan}
+                                                        </option>
+                                                    ))}
+                                                </Form.Select>
+                                            </div>
+                                        </Col>
+                                    </Row>
                                     <Row>
                                         <Col md={12}>
                                             <div className="mb-3">
@@ -943,21 +981,54 @@ const MyModal = ({ show, handleClose, id, isEditing, isTable }) => {
                 ) : (location.pathname.includes("/pwa-b2b/unit")) ? (
                     <>
                         <Form onSubmit={handleSubmit} method="POST">
-                        <div className="mb-3">
-                            <label htmlFor="satuan" className="form-label">
-                                Satuan
-                            </label>
-                            <input
-                                type="text"
-                                className="form-control"
-                                id="satuan"
-                                name="satuan"
-                                placeholder="Masukkan Satuan"
-                                value={formData.satuan || ""}
-                                onChange={handleChange}
-                            />
-                        </div>
-                    </Form>
+                            <div className="mb-3">
+                                <label htmlFor="satuan" className="form-label">
+                                    Satuan
+                                </label>
+                                <input
+                                    type="text"
+                                    className="form-control"
+                                    id="satuan"
+                                    name="satuan"
+                                    placeholder="Masukkan Satuan"
+                                    value={formData.satuan || ""}
+                                    onChange={handleChange}
+                                />
+                            </div>
+                        </Form>
+                    </>
+                ) : (location.pathname.includes("/pwa-b2b/component-others")) ? (
+                    <>
+                        <Form onSubmit={handleSubmit} method="POST">
+                            <div className="mb-3">
+                                <label htmlFor="komponen" className="form-label">
+                                    Nama Komponen
+                                </label>
+                                <input
+                                    type="text"
+                                    className="form-control"
+                                    id="komponen"
+                                    name="komponen"
+                                    placeholder="Masukkan Nama Komponen"
+                                    value={formData.komponen || ""}
+                                    onChange={handleChange}
+                                />
+                            </div>
+                            <div className="mb-3">
+                                <label htmlFor="harga" className="form-label">
+                                    Harga Komponen
+                                </label>
+                                <input
+                                    type="text"
+                                    className="form-control"
+                                    id="harga"
+                                    name="harga"
+                                    placeholder="Masukkan Harga Komponen"
+                                    value={formData.harga || ""}
+                                    onChange={handleChange}
+                                />
+                            </div>
+                        </Form>
                     </>
                 ) : (
                     <Form onSubmit={handleSubmit} method="POST">

@@ -238,6 +238,11 @@ export default (props = {}) => {
           id: 62,
           title: "Unit",
           link: Routes.PwaB2bUnit.path
+        },
+        {
+          id: 63,
+          title: "Komponen Lainnya",
+          link: Routes.PwaB2bComponentOthers.path
         }
         // {
         //   id: 60,

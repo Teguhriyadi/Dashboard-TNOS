@@ -821,6 +821,10 @@ export default () => {
       });
   }, [id]);
 
+  console.log("Ada");
+  console.log(getGuardData);
+  
+
   const updateHistoryByDate = (e) => {
     e.preventDefault();
     const formData = new FormData(e.target);

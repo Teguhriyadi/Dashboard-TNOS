@@ -11,7 +11,7 @@ import ReadableDateTime from "./ReadableDateTime";
 export const TnosDataTable = (props) => {
 
     const location = useLocation()
-    const isSecurityProviderRoute = location.pathname === "/pwa-b2b/security-provider" || location.pathname.startsWith("/pwa-b2b/security-provider/") || location.pathname.startsWith("/pwa-b2b/layanan/") || location.pathname.startsWith("/pwa-b2b/section") || location.pathname.endsWith("/others") || location.pathname.includes("/unit");
+    const isSecurityProviderRoute = location.pathname === "/pwa-b2b/security-provider" || location.pathname.startsWith("/pwa-b2b/security-provider/") || location.pathname.startsWith("/pwa-b2b/layanan/") || location.pathname.startsWith("/pwa-b2b/section") || location.pathname.endsWith("/others") || location.pathname.includes("/unit") || location.pathname.includes("/component-others");
     const isTAB = location.pathname === "/tab/kategori-usaha" || location.pathname === "/tab/banner";
 
     const [showModal, setShowModal] = useState(false);
@@ -307,6 +307,11 @@ export const TnosDataTable = (props) => {
             { label: "Nomor HP", value: "nomor_hp" },
             { label: "Username", value: "username" },
             { label: "Status", value: "status" },
+        ],
+        "pwa-b2b-unit": [
+            { label: "Satuan", value: "satuan" },
+            { label: "Slug", value: "slug" },
+            { label: "Status", value: "status" }
         ]
     }
 
@@ -595,6 +600,8 @@ export const TnosDataTable = (props) => {
                 newItem.nomor_hp = newItem.detail.phone_number
                 newItem.username = newItem.detail.username
                 // newItem.nama = newItem.detail.account_status_id === ""
+            } else if (props.getMenu === "pwa-b2b-unit") {
+                newItem.status = newItem.status === 1 ? "Aktif" : "Tidak Aktif"
             }
 
             return newItem;
@@ -663,7 +670,7 @@ export const TnosDataTable = (props) => {
                                             <FontAwesomeIcon icon={faFileExcel} style={{ marginRight: "10px" }} /> Export Excel
                                         </Button>
                                     }
-                                    filename={props.getMenu === "akun-external" || props.getMenu === "akun-partner" || props.getMenu === "akun-internal" || props.getMenu === "tab-b2b-insiden" || props.getMenu === "tab-b2b-master-paket" || props.getMenu === "tab-kategori-usaha" || props.getMenu === "pwa-b2b-order" || props.getMenu === "artikel-tags" || props.getMenu === "artikel-kategori" || props.getMenu === "artikel-sub-kategori" || props.getMenu === "artikel-data" || props.getMenu === "tnos-admin/user" || props.getMenu === "detail-akun-internal" || props.getMenu === "export-data-security-provider" || props.getMenu === "pwa-b2b-transaksi" || props.getMenu === "pwa-b2b-pembayaran" || props.getMenu === "pwa-b2b-penyesuaian" || props.getMenu === "order-cancel" || props.getMenu === "order-on-progress" || props.getMenu === "order-success" || props.getMenu === "tab-insiden" || props.getMenu === "tab-responder" || props.getMenu === "detail-akun-user" || props.getMenu === "detail-akun-responder" || props.getMenu === "detail-akun-partner" || props.getMenu === "detail-akun-insiden-siplah" || props.getMenu === "detail-akun-user-siplah" ? (
+                                    filename={props.getMenu === "akun-external" || props.getMenu === "akun-partner" || props.getMenu === "akun-internal" || props.getMenu === "tab-b2b-insiden" || props.getMenu === "tab-b2b-master-paket" || props.getMenu === "tab-kategori-usaha" || props.getMenu === "pwa-b2b-order" || props.getMenu === "artikel-tags" || props.getMenu === "artikel-kategori" || props.getMenu === "artikel-sub-kategori" || props.getMenu === "artikel-data" || props.getMenu === "tnos-admin/user" || props.getMenu === "detail-akun-internal" || props.getMenu === "export-data-security-provider" || props.getMenu === "pwa-b2b-transaksi" || props.getMenu === "pwa-b2b-pembayaran" || props.getMenu === "pwa-b2b-penyesuaian" || props.getMenu === "order-cancel" || props.getMenu === "order-on-progress" || props.getMenu === "order-success" || props.getMenu === "tab-insiden" || props.getMenu === "tab-responder" || props.getMenu === "detail-akun-user" || props.getMenu === "detail-akun-responder" || props.getMenu === "detail-akun-partner" || props.getMenu === "detail-akun-insiden-siplah" || props.getMenu === "detail-akun-user-siplah" || props.getMenu === "pwa-b2b-unit" ? (
                                         `export-data-${props.getMenu}`
                                     ) : (
                                         `export-data-${props.getMenu}-${props.getTanggalMulai}-${props.getTanggalAkhir}`

@@ -91,14 +91,11 @@ export default () => {
             num
         } = props;
 
-        const handleChange = (institution_id, currentChecked) => {
+        const handleChange = (username, currentChecked) => {
             const newStatus = !currentChecked ? "active" : "inactive";
             axios
-                .put(
-                    `${process.env.REACT_APP_API_TAB_ORGANISASI}/account/admin/${institution_id}/put/account_status`,
-                    {
-                        account_status: newStatus,
-                    }
+                .post(
+                    `${process.env.REACT_APP_API_TAB_ORGANISASI}/account/admin/${username}/account_status/komunitas`
                 )
                 .then((response) => {
                     if (response.data.statusCode === 200) {
@@ -146,7 +143,7 @@ export default () => {
                 <td className="text-center text-uppercase">
                     <Switch
                         checked={checked}
-                        onChange={() => handleChange(institution_id, checked)}
+                        onChange={() => handleChange(username, checked)}
                         height={20}
                         width={48}
                         className="react-switch"
