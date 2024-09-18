@@ -14,9 +14,10 @@ const MyModal = ({ show, handleClose, id, isEditing, isTable }) => {
     const [platformFee, setPlatformFee] = useState(0);
     const [pricePPN, setPricePPN] = useState(0);
     const [pricePWA, setPricePWA] = useState(0);
-    const [hargaIncludeTNOSRange, setHargaIncludeTNOSRange] = useState(0);
-    const [includeTnosFee, setIncludeTnosFee] = useState(0);
-    const [selectedSetting, setSelectedSetting] = useState(0);
+    const [hargaIncludeTNOSRange, setHargaIncludeTNOSRange] = useState(0)
+    const [includeTnosFee, setIncludeTnosFee] = useState(0)
+    const [selectedSetting, setSelectedSetting] = useState(0)
+    const [selectedSatuanUnit, setSelectedSatuanUnit] = useState(0)
     const [getReference, setReference] = useState([])
     const [selectedOptions, setSelectedOptions] = useState([]);
 
@@ -146,6 +147,7 @@ const MyModal = ({ show, handleClose, id, isEditing, isTable }) => {
                     include_ppn: pricePPN,
                     tnos_fee: tnosFee,
                     platform_fee: platformFee,
+                    satuan: selectedSatuanUnit,
                     status: 1,
                 }
 
@@ -438,18 +440,17 @@ const MyModal = ({ show, handleClose, id, isEditing, isTable }) => {
             try {
                 let response = await axios.get(`${process.env.REACT_APP_API_PWA_TNOS_DSBRD_URL}/pwa-revamp/unit`)
 
-                console.log("Data");
-                console.log(response.data.data.unit);
-                
                 setSatuanUnit(response.data.data.unit)
             } catch (error) {
-                console.log(error);   
+                console.log(error);
             }
         }
 
         if (location.pathname.includes("lainnya")) {
             fetchDataColumn();
+        } else if (location.pathname.includes("pwa-b2b/section") || location.pathname.includes("pwa-b2b/lainnya")) {
             fetchDataUnit()
+
         }
 
     }, [location.pathname]);
@@ -483,7 +484,7 @@ const MyModal = ({ show, handleClose, id, isEditing, isTable }) => {
 
             fetchDataById();
         }
-    }, [id, isTable, selectedSetting]);
+    }, [id, isTable, selectedSetting, selectedSatuanUnit]);
 
     return (
         <Modal show={show} onHide={handleClose}>
@@ -541,9 +542,10 @@ const MyModal = ({ show, handleClose, id, isEditing, isTable }) => {
                                                 <label htmlFor="satuan" className="form-label"> Satuan </label>
                                                 <Form.Select
                                                     name="satuan"
-                                                    value={selectedSetting}
-                                                    onChange={(e) => setSelectedSetting(parseInt(e.target.value))}
+                                                    value={selectedSatuanUnit}
+                                                    onChange={(e) => setSelectedSatuanUnit(e.target.value)}
                                                 >
+                                                    <option value="">- Pilih -</option>
                                                     {getSatuanUnit?.map((item) => (
                                                         <option key={item.key} value={item.id}>
                                                             {item.satuan}
@@ -751,20 +753,41 @@ const MyModal = ({ show, handleClose, id, isEditing, isTable }) => {
                     </>
                 ) : (location.pathname.includes("/pwa-b2b/lainnya")) ? (
                     <Form onSubmit={handleSubmit} method="POST">
-                        <div className="mb-3">
-                            <label htmlFor="others_column" className="form-label">
-                                Others Column
-                            </label>
-                            <input
-                                type="text"
-                                className="form-control"
-                                id="others_column"
-                                name="others_column"
-                                placeholder="Masukkan Others Column"
-                                value={formData.others_column || ""}
-                                onChange={handleChange}
-                            />
-                        </div>
+                        <Row>
+                            <Col md={6}>
+                                <div className="mb-3">
+                                    <label htmlFor="others_column" className="form-label">
+                                        Others Column
+                                    </label>
+                                    <input
+                                        type="text"
+                                        className="form-control"
+                                        id="others_column"
+                                        name="others_column"
+                                        placeholder="Masukkan Others Column"
+                                        value={formData.others_column || ""}
+                                        onChange={handleChange}
+                                    />
+                                </div>
+                            </Col>
+                            <Col md={6}>
+                                <div className="mb-3">
+                                    <label htmlFor="satuan" className="form-label"> Satuan </label>
+                                    <Form.Select
+                                        name="satuan"
+                                        value={selectedSatuanUnit}
+                                        onChange={(e) => setSelectedSatuanUnit(e.target.value)}
+                                    >
+                                        <option value="">- Pilih -</option>
+                                        {getSatuanUnit?.map((item) => (
+                                            <option key={item.key} value={item.id}>
+                                                {item.satuan}
+                                            </option>
+                                        ))}
+                                    </Form.Select>
+                                </div>
+                            </Col>
+                        </Row>
                         <div className="mb-3">
                             <label htmlFor="reference_id" className="form-label">
                                 Reference Column
